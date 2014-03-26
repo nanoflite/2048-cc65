@@ -57,6 +57,7 @@ bool game_is_finsihed(void)
 }
 
 static void move_up(void);
+static void move_down(void);
 
 void game_move(direction direction)
 {
@@ -65,18 +66,14 @@ void game_move(direction direction)
     case DIR_UP:
       move_up();
       break;
+    case DIR_DOWN:
+      move_down();
+      break;
   }
 }
 
 static void move_up(void)
 {
-  // up: v_x = 0, v_y = -1, y_start = width, scan column wise
-  // find first non 0 value tile
-  // compare to value of position
-  // if match then merge
-  // else
-  // place position + 1
-  // take note of next position, repeat until all cells checked
   unsigned char x;
   unsigned char y;
   tile *other_tile;
@@ -87,7 +84,6 @@ static void move_up(void)
 
   for(x=0;x<width;x++) {
 
-    other_tile = NULL;
     other_y = 0;
 
     for(y=0;y<width;y++) {
@@ -95,34 +91,79 @@ static void move_up(void)
       tile = grid_get( x, y );
       value = tile_get_value(tile);
 
-      if ( 0 != value ) {
-        if ( y != other_y ) {
+      if ( 0 != value &&  y != other_y ) {
 
-          other_tile = grid_get( x, other_y );
-          other_value = tile_get_value(other_tile);
-          
-          if (value == other_value) {
-            tile_set_value(other_tile, value + other_value );
-            tile_set_value(tile, 0);
-            moved = true;
-          } else {
+        other_tile = grid_get( x, other_y );
+        other_value = tile_get_value(other_tile);
+        
+        if (value == other_value) {
+          tile_set_value(other_tile, value + other_value );
+          tile_set_value(tile, 0);
+          moved = true;
+        } else {
+          if ( y != other_y + 1 ) {
             if ( 0 != other_value ) {
               other_tile = grid_get( x, other_y + 1 );
             }
-            if ( y != other_y + 1 ) {
-              tile_set_value(tile, 0);
-              tile_set_value(other_tile, value);
-              moved = true;
-            }
+            tile_set_value(tile, 0);
+            tile_set_value(other_tile, value);
+            moved = true;
           }
-
-          other_y = y; 
- 
         }
+
+        other_y = y; 
+
       }
     }
   }
 }
+
+static void move_down(void)
+{
+  unsigned char x;
+  signed char y;
+  tile *other_tile;
+  tile *tile;
+  unsigned char other_y;
+  unsigned int value;
+  unsigned int other_value;
+
+  for(x=0;x<width;x++) {
+
+    other_y = width-1;
+
+    for(y=width-1;y>=0;y--) {
+
+      tile = grid_get( x, y );
+      value = tile_get_value(tile);
+
+      if ( 0 != value &&  y != other_y ) {
+
+        other_tile = grid_get( x, other_y );
+        other_value = tile_get_value(other_tile);
+
+        if (value == other_value) {
+          tile_set_value(other_tile, value + other_value );
+          tile_set_value(tile, 0);
+          moved = true;
+        } else {
+          if ( y != other_y ) {
+            if ( 0 != other_value ) {
+              other_tile = grid_get( x, other_y - 1);
+            }
+            tile_set_value(tile, 0);
+            tile_set_value(other_tile, value);
+            moved = true;
+          }
+        }
+
+        other_y = y; 
+
+      }
+    }
+  }
+}
+
 
 void game_draw(void)
 {
