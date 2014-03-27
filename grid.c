@@ -24,28 +24,17 @@ void grid_init(void)
 
 }
 
-void grid_draw(void)
+void grid_draw(grid_draw_cell_cb draw_cell)
 {
   unsigned char i;
   unsigned char j;
-  unsigned char x;
-  unsigned char y;
-  unsigned int value;
   tile *tile;
 
-  y = 0; 
   for(i=0; i<width; i++) {
-    x = 0;
     for(j=0; j<width; j++) {
       tile = &grid[i][j];
-      value = tile_get_value(tile);
-      if (0 != value) {
-        gotoxy( x, y );
-        cprintf("%d", value);  
-      }
-      x += 4;
+      draw_cell( tile );
     }
-    y += 4;
   }
  
 }

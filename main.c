@@ -4,6 +4,16 @@
 
 #include "game.h"
 
+void draw_cell(char x, char y, unsigned int value)
+{
+  if ( 0 == value ) {
+    return;
+  } 
+
+  gotoxy( x << 2, y << 2 );
+  printf("%d", value); 
+}
+
 int main(int argc, char *argv[])
 {
   char input;
@@ -13,7 +23,7 @@ int main(int argc, char *argv[])
   while(1) {
     
     clrscr();
-    game_draw();
+    game_draw(draw_cell);
 
     while(!kbhit()) {};
 

@@ -11,6 +11,8 @@ typedef enum direction {
   DIR_UNKNOWN
 } direction;
 
+typedef void (*game_draw_cell_cb)(char x, char y, unsigned int value);
+
 void game_init(void);
 
 void game_add_random_tile(void);
@@ -19,7 +21,7 @@ bool game_is_finsihed(void);
 
 void game_move(direction direction);
 
-void game_draw(void);
+void game_draw(game_draw_cell_cb draw_cell);
 
 bool game_won(void);
 

@@ -21,6 +21,7 @@ static bool matching_tiles_available(void);
 
 bool won;
 bool moved;
+game_draw_cell_cb draw_cell_cb;
 
 void game_init(void)
 {
@@ -166,9 +167,15 @@ static void pull_up(grid_get_f get_tile, signed char row_start, signed char row_
   }
 }
 
-void game_draw(void)
+static void _draw_cell(tile *tile)
 {
-  grid_draw();
+  draw_cell_cb( tile->x, tile->y, tile->value ); 
+}
+
+void game_draw(game_draw_cell_cb draw_cell)
+{
+  draw_cell_cb = draw_cell;
+  grid_draw(_draw_cell);
 }
 
 static void insert_start_tiles(void)

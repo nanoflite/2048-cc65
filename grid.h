@@ -8,9 +8,11 @@
 
 #define width (4)
 
+typedef void (*grid_draw_cell_cb)(tile *tile);
+
 void grid_init(void);
 
-void grid_draw(void);
+void grid_draw(grid_draw_cell_cb);
 
 tile *grid_random_available_cell(void);
 
