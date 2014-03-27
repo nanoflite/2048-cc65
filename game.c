@@ -122,41 +122,41 @@ static void move_left(void)
 
 static void move(grid_get_f get_tile)
 {
-  unsigned char x;
-  unsigned char y;
-  tile *other_tile;
-  tile *tile;
-  unsigned char other_y;
+  char column;
+  signed char row;
+  signed char previous_row;
   unsigned int value;
-  unsigned int other_value;
+  unsigned int previous_value;
+  tile *previous_tile;
+  tile *tile;
 
-  for(x=0;x<width;x++) {
+  for(column=0;column<width;column++) {
 
-    other_y = 0;
+    previous_row = 0;
 
-    for(y=0;y<width;y++) {
+    for(row=0;row<width;row++) {
 
-      tile = get_tile( x, y );
+      tile = get_tile( column, row );
       value = tile_get_value(tile);
 
-      if ( 0 != value &&  y != other_y ) {
+      if ( 0 != value &&  row != previous_row ) {
 
-        other_tile = get_tile( x, other_y );
-        other_value = tile_get_value(other_tile);
+        previous_tile = get_tile( column, previous_row );
+        previous_value = tile_get_value(previous_tile);
         
-        if (value == other_value) {
-          tile_set_value(other_tile, value + other_value );
+        if (value == previous_value) {
+          tile_set_value(previous_tile, value + previous_value );
           tile_set_value(tile, 0);
           moved = true;
-          other_y = y;
+          previous_row = row;
         } else {
-          if ( y != other_y ) {
-            if ( 0 != other_value ) {
-              other_tile = get_tile( x, other_y + 1 );
-              other_y++; 
+          if ( row != previous_row ) {
+            if ( 0 != previous_value ) {
+              previous_tile = get_tile( column, previous_row + 1 );
+              previous_row++; 
             }
             tile_set_value(tile, 0);
-            tile_set_value(other_tile, value);
+            tile_set_value(previous_tile, value);
             moved = true;
           }
         }
