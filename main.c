@@ -4,14 +4,14 @@
 
 #include "game.h"
 
-void draw_cell(char x, char y, unsigned int value)
+void draw_cell(tile *tile)
 {
-  if ( 0 == value ) {
+  if ( 0 == tile->value ) {
     return;
-  } 
+  }
 
-  gotoxy( x << 2, y << 2 );
-  printf("%d", value); 
+  gotoxy( tile->x << 2, tile->y << 2 );
+  printf("%d", tile->value); 
 }
 
 int main(int argc, char *argv[])

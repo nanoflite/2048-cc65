@@ -169,7 +169,7 @@ static void pull_up(grid_get_f get_tile, signed char row_start, signed char row_
 
 static void _draw_cell(tile *tile)
 {
-  draw_cell_cb( tile->x, tile->y, tile->value ); 
+  draw_cell_cb( tile ); 
 }
 
 void game_draw(game_draw_cell_cb draw_cell)

@@ -1,5 +1,7 @@
 #include <stdbool.h>
 
+#include "tile.h"
+
 #define PERCENT_CHANCE_FOR_A_4 ( RAND_MAX / 50 )
 #define nr_start_tiles 2
 
@@ -11,7 +13,7 @@ typedef enum direction {
   DIR_UNKNOWN
 } direction;
 
-typedef void (*game_draw_cell_cb)(char x, char y, unsigned int value);
+typedef void (*game_draw_cell_cb)(tile *tile);
 
 void game_init(void);
 
