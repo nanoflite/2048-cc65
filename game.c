@@ -8,6 +8,9 @@
 #include "grid.h"
 #include "tile.h"
 
+
+typedef tile* (*grid_get_f)(char x, char y);
+
 char vector_x[] = {  0, 1, 0, -1 };
 char vector_y[] = { -1, 0, 1,  0 };
 
@@ -21,6 +24,7 @@ bool moved;
 
 void game_init(void)
 {
+  _randomize();
   grid_init();
   insert_start_tiles();
   won = false;
@@ -29,6 +33,19 @@ void game_init(void)
 
 void game_add_random_tile(void)
 {
+  /*
+  char y[2];
+  tile *tile;
+  static char index = 0;
+
+  y[0] = 1;
+  y[1] = 3;
+
+  tile = grid_get( 1, y[index] );
+  tile_set_value(tile, 2);
+  index++;
+  index &= 3; 
+  */
   tile *tile;
   unsigned int value;
 
@@ -56,8 +73,11 @@ bool game_is_finsihed(void)
   return ! moves_available() || won;
 }
 
+static void move(grid_get_f get_tile);
 static void move_up(void);
-static void move_down(void);
+// static void move_down(void);
+// static void move_right(void);
+static void move_left(void);
 
 void game_move(direction direction)
 {
@@ -66,13 +86,41 @@ void game_move(direction direction)
     case DIR_UP:
       move_up();
       break;
+    /*
     case DIR_DOWN:
       move_down();
+      break;
+    case DIR_RIGHT:
+      move_right();
+      break;
+    */
+    case DIR_LEFT:
+      move_left();
       break;
   }
 }
 
+static tile* get_xy(char x, char y)
+{
+  return grid_get(x, y);
+}
+
+static tile* get_yx(char x, char y)
+{
+  return grid_get(y, x);
+}
+
 static void move_up(void)
+{
+  move(get_xy);
+}
+
+static void move_left(void)
+{
+  move(get_yx);
+}
+
+static void move(grid_get_f get_tile)
 {
   unsigned char x;
   unsigned char y;
@@ -88,82 +136,34 @@ static void move_up(void)
 
     for(y=0;y<width;y++) {
 
-      tile = grid_get( x, y );
+      tile = get_tile( x, y );
       value = tile_get_value(tile);
 
       if ( 0 != value &&  y != other_y ) {
 
-        other_tile = grid_get( x, other_y );
+        other_tile = get_tile( x, other_y );
         other_value = tile_get_value(other_tile);
         
         if (value == other_value) {
           tile_set_value(other_tile, value + other_value );
           tile_set_value(tile, 0);
           moved = true;
-        } else {
-          if ( y != other_y + 1 ) {
-            if ( 0 != other_value ) {
-              other_tile = grid_get( x, other_y + 1 );
-            }
-            tile_set_value(tile, 0);
-            tile_set_value(other_tile, value);
-            moved = true;
-          }
-        }
-
-        other_y = y; 
-
-      }
-    }
-  }
-}
-
-static void move_down(void)
-{
-  unsigned char x;
-  signed char y;
-  tile *other_tile;
-  tile *tile;
-  unsigned char other_y;
-  unsigned int value;
-  unsigned int other_value;
-
-  for(x=0;x<width;x++) {
-
-    other_y = width-1;
-
-    for(y=width-1;y>=0;y--) {
-
-      tile = grid_get( x, y );
-      value = tile_get_value(tile);
-
-      if ( 0 != value &&  y != other_y ) {
-
-        other_tile = grid_get( x, other_y );
-        other_value = tile_get_value(other_tile);
-
-        if (value == other_value) {
-          tile_set_value(other_tile, value + other_value );
-          tile_set_value(tile, 0);
-          moved = true;
+          other_y = y;
         } else {
           if ( y != other_y ) {
             if ( 0 != other_value ) {
-              other_tile = grid_get( x, other_y - 1);
+              other_tile = get_tile( x, other_y + 1 );
+              other_y++; 
             }
             tile_set_value(tile, 0);
             tile_set_value(other_tile, value);
             moved = true;
           }
         }
-
-        other_y = y; 
-
       }
     }
   }
 }
-
 
 void game_draw(void)
 {
@@ -172,6 +172,28 @@ void game_draw(void)
 
 static void insert_start_tiles(void)
 {
+  tile *tile;
+
+  // 0123
+  // _2_2
+  tile = grid_get(0, 1);
+  tile_set_value(tile, 2); 
+
+  tile = grid_get(0, 3);
+  tile_set_value(tile, 2); 
+
+  // 0123
+  // 422_
+  tile = grid_get(1, 0);
+  tile_set_value(tile, 4); 
+
+  tile = grid_get(1, 1);
+  tile_set_value(tile, 2); 
+
+  tile = grid_get(1, 2);
+  tile_set_value(tile, 2); 
+
+  /*
   unsigned char i;
   tile *tile;
 
@@ -179,6 +201,7 @@ static void insert_start_tiles(void)
     tile = grid_random_available_cell();
     tile_set_value(tile, 2); 
   }
+  */
 }
 
 static unsigned int get_random_value(void)
