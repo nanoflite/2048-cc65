@@ -6,25 +6,38 @@
 
 void draw_cell(tile *tile)
 {
-  if ( 0 == tile->value ) {
-    return;
-  }
-
   gotoxy( tile->x << 2, tile->y << 2 );
-  printf("%d", tile->value); 
+
+  if (tile->added) {
+    textcolor( COLOR_RED );
+  }
+  if (tile->moved) {
+    textcolor( COLOR_WHITE );
+  }
+  if ( 0 == tile->value ) {
+    puts("    ");
+  } else {
+    printf("%d", tile->value); 
+  }
+  textcolor( COLOR_BLACK );
+
+  tile_set_added(tile, false);
+  tile_set_moved(tile, false);
 }
 
 int main(int argc, char *argv[])
 {
   char input;
   direction direction;
-  game_init();
+  game_init(draw_cell);
+
+  textcolor( COLOR_BLACK );
+  clrscr();
 
   while(1) {
-    
-    clrscr();
-    game_draw(draw_cell);
 
+    game_draw();   
+ 
     while(!kbhit()) {};
 
     input = cgetc();

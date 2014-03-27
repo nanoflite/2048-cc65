@@ -15,7 +15,7 @@ typedef enum direction {
 
 typedef void (*game_draw_cell_cb)(tile *tile);
 
-void game_init(void);
+void game_init(game_draw_cell_cb draw_cell);
 
 void game_add_random_tile(void);
 
@@ -23,8 +23,8 @@ bool game_is_finsihed(void);
 
 void game_move(direction direction);
 
-void game_draw(game_draw_cell_cb draw_cell);
-
 bool game_won(void);
 
 bool game_moved(void);
+
+void game_draw(void);

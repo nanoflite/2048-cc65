@@ -23,8 +23,10 @@ bool won;
 bool moved;
 game_draw_cell_cb draw_cell_cb;
 
-void game_init(void)
+void game_init(game_draw_cell_cb draw_cell)
 {
+  draw_cell_cb = draw_cell;
+
   _randomize();
   grid_init();
   insert_start_tiles();
@@ -144,12 +146,14 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
 
       if (value != 0 && value == next_value) {
         tile_set_value(tile, value + next_value );
+        tile_set_added( tile, true );
         tile_set_value(next_tile, 0);
         moved = true;
       }
 
       if (value == 0 && next_value != 0) {
         tile_set_value(tile, next_value );
+        tile_set_moved(tile, true);
         tile_set_value(next_tile, 0);
         moved = true;
       }
@@ -159,22 +163,22 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
   } 
 }
 
-static void pull_up(grid_get_f get_tile, signed char row_start, signed char row_vector)
-{
-  char i;
-  for(i=0;i<width-1;i++) {
-    _pull_up(get_tile, row_start, row_vector);
-  }
-}
-
 static void _draw_cell(tile *tile)
 {
   draw_cell_cb( tile ); 
 }
 
-void game_draw(game_draw_cell_cb draw_cell)
+static void pull_up(grid_get_f get_tile, signed char row_start, signed char row_vector)
 {
-  draw_cell_cb = draw_cell;
+  char i;
+  for(i=0;i<width-1;i++) {
+    _pull_up(get_tile, row_start, row_vector);
+    grid_draw(_draw_cell);
+  }
+}
+
+void game_draw(void)
+{
   grid_draw(_draw_cell);
 }
 
