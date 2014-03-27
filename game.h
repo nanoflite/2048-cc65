@@ -2,8 +2,10 @@
 
 #include "tile.h"
 
-#define PERCENT_CHANCE_FOR_A_4 ( RAND_MAX / 50 )
 #define nr_start_tiles 2
+#define GOAL 2048
+
+#define PERCENT_CHANCE_FOR_A_4 ( RAND_MAX / 50 )
 
 typedef enum direction {
   DIR_UP,
@@ -28,3 +30,5 @@ bool game_won(void);
 bool game_moved(void);
 
 void game_draw(void);
+
+void game_dump(void);

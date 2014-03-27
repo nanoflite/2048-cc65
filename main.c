@@ -4,25 +4,43 @@
 
 #include "game.h"
 
+char drawn = 0;
+
 void draw_cell(tile *tile)
 {
-  gotoxy( tile->x << 2, tile->y << 2 );
+  char x;
+  char y;
+  unsigned int value;
 
-  if (tile->added) {
+  value = tile_get_value(tile);
+
+  x = tile->x << 2;
+  y = tile->y << 2;
+  gotoxy( x, y );
+
+  if (tile_added(tile)) {
     textcolor( COLOR_RED );
   }
-  if (tile->moved) {
+
+  if (tile_moved(tile)) {
     textcolor( COLOR_WHITE );
   }
-  if ( 0 == tile->value ) {
+
+  if ( 0 == value ) {
     puts("    ");
   } else {
-    printf("%d", tile->value); 
+    printf("%d", value);
   }
-  textcolor( COLOR_BLACK );
 
-  tile_set_added(tile, false);
-  tile_set_moved(tile, false);
+  textcolor( COLOR_BLACK );
+  
+  /*
+  gotoxy(20, tile->y * 4 + tile->x);
+  printf("x:%d, y:%d, v:%d, d:%d\n", tile->x, tile->y, tile->value, tile_dirty(tile));
+  drawn++;
+  gotoxy(0, 20);
+  printf("%d", drawn);
+  */
 }
 
 int main(int argc, char *argv[])
@@ -36,6 +54,8 @@ int main(int argc, char *argv[])
 
   while(1) {
 
+    clrscr();
+    drawn=0;
     game_draw();   
  
     while(!kbhit()) {};
@@ -58,19 +78,28 @@ int main(int argc, char *argv[])
       case 'A':
         direction = DIR_LEFT;
         break;
+      case '?':
+        game_dump();
+        break;
       default:
         direction = DIR_UNKNOWN;
     }
     game_move(direction);
-
-    if (game_is_finsihed()) {
-      break;
-    }
-    
+   
     if (game_moved()) {
       game_add_random_tile();
     }
 
+    if (game_is_finsihed()) {
+      break;
+    }
+ 
+  }
+  
+  if ( game_won() ) {
+    printf("\nYOU WIN!");
+  } else {
+    printf("\nGAME OVER");
   }
 
   return 0;
