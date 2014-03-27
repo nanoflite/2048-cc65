@@ -6,6 +6,7 @@
 
 
 tile grid[width][width];
+tile tile_null;
 
 void grid_init(void)
 {
@@ -18,6 +19,9 @@ void grid_init(void)
       tile_init(tile, j, i, 0);
     }
   }
+
+  tile_init(&tile_null, 0, 0, 0);
+
 }
 
 void grid_draw(void)
@@ -95,7 +99,14 @@ bool grid_cells_are_available(void)
   return available; 
 }
 
-tile* grid_get(unsigned char x, unsigned char y)
+tile* grid_get(signed char x, signed char y)
 {
-  return &grid[y][x];
+  if ( grid_within_bounds(x, y) ) {
+    return &grid[y][x];
+  }
+  return NULL;
 }
+
+bool grid_within_bounds(signed char x, signed char y) {
+  return x >= 0 && x < width && y >= 0 && y < width;
+} 

@@ -60,7 +60,7 @@ bool game_is_finsihed(void)
   return ! moves_available() || won;
 }
 
-static void move(grid_get_f get_tile, signed char row_start, signed char row_vector);
+static void pull_up(grid_get_f get_tile, signed char row_start, signed char row_vector);
 static void move_up(void);
 static void move_down(void);
 static void move_right(void);
@@ -97,70 +97,72 @@ static tile* get_yx(char x, char y)
 
 static void move_up(void)
 {
-  move(get_xy, 0, 1);
+  pull_up(get_xy, 0, 1);
 }
 
 static void move_left(void)
 {
-  move(get_yx, 0, 1);
+  pull_up(get_yx, 0, 1);
 }
 
 static void move_down(void)
 {
-  move(get_xy, width-1, -1);
+  pull_up(get_xy, width-1, -1);
 }
 
 static void move_right(void)
 {
-  move(get_yx, width-1, -1);
+  pull_up(get_yx, width-1, -1);
 }
 
-static void move(grid_get_f get_tile, signed char row_start, signed char row_vector)
+static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row_vector)
 {
   char column;
   signed char row;
-  signed char previous_row;
+  signed char next_row;
   unsigned int value;
-  unsigned int previous_value;
-  tile *previous_tile;
+  unsigned int next_value;
+  tile *next_tile;
   tile *tile;
-  char i;
-  
-  for(column=0;column<width;column++) {
+  signed char i;
 
-    row = row_start;
-    previous_row = row_start;
-    for(i=0;i<width;i++) {
-
+  row = row_start;
+  for(i=0;i<width;i++) {
+    for(column=0;column<width;column++) {
       tile = get_tile( column, row );
       value = tile_get_value(tile);
-
-      if ( 0 != value &&  row != previous_row ) {
-
-        previous_tile = get_tile( column, previous_row );
-        previous_value = tile_get_value(previous_tile);
-        
-        if (value == previous_value) {
-          tile_set_value(previous_tile, value + previous_value );
-          tile_set_value(tile, 0);
-          moved = true;
-          previous_row = row;
-        } else {
-          if ( row != previous_row ) {
-            if ( 0 != previous_value ) {
-              previous_row += row_vector; 
-              previous_tile = get_tile( column, previous_row );
-            }
-            tile_set_value(tile, 0);
-            tile_set_value(previous_tile, value);
-            moved = true;
-          }
-        }
-      }
       
-      row += row_vector;
-    }
+      next_row = row + row_vector;
 
+      if ( ! grid_within_bounds( column, next_row ) ) {
+        continue;
+      }
+
+      next_tile = get_tile( column, next_row );
+      next_value = tile_get_value(next_tile);
+
+      if (value != 0 && value == next_value) {
+        tile_set_value(tile, value + next_value );
+        tile_set_value(next_tile, 0);
+        moved = true;
+      }
+
+      if (value == 0 && next_value != 0) {
+        tile_set_value(tile, next_value );
+        tile_set_value(next_tile, 0);
+        moved = true;
+      }
+
+    }
+    row += row_vector; 
+  } 
+}
+
+static void pull_up(grid_get_f get_tile, signed char row_start, signed char row_vector)
+{
+  char i;
+  for(i=0;i<width-1;i++) {
+    _pull_up(get_tile, row_start, row_vector);
   }
 }
 

@@ -18,6 +18,8 @@ void grid_available_cells(array *cells);
 
 bool grid_cells_are_available(void);
 
-tile *grid_get(unsigned char x, unsigned char y);
+tile *grid_get(signed char x, signed char y);
+
+bool grid_within_bounds(signed char x, signed char y);
 
 #endif
