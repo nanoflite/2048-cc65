@@ -2,21 +2,49 @@
 
 #include <conio.h>
 
+#include "map.h"
 #include "game.h"
+#include "characters.h"
+#include "map_data.h"
 
 char drawn = 0;
 
-void draw_cell(tile *tile)
+const char *values[] = {
+  "    ",
+  " 2  ",
+  " 4  ",
+  " 8  ",
+  " 16 ",
+  " 32 ",
+  " 64 ",
+  "128 ",
+  "256 ",
+  "512 ",
+  "1024",
+  "2048"
+};
+
+const char pos_x[] = {
+  1 + 0 * 6,
+  1 + 1 * 6,
+  1 + 2 * 6,
+  1 + 3 * 6
+};
+
+const char pos_y[] = {
+  1 + 0 * 6,
+  1 + 1 * 6,
+  1 + 2 * 6,
+  1 + 3 * 6
+};
+
+static void draw_cell(tile *tile)
 {
   char x;
   char y;
-  unsigned int value;
+  unsigned char value;
+  const char *s;
 
-  value = tile_get_value(tile);
-
-  x = tile->x << 2;
-  y = tile->y << 2;
-  gotoxy( x, y );
 
   if (tile_added(tile)) {
     textcolor( COLOR_RED );
@@ -25,16 +53,16 @@ void draw_cell(tile *tile)
   if (tile_moved(tile)) {
     textcolor( COLOR_WHITE );
   }
-
-  if ( 0 == value ) {
-    puts("    ");
-  } else {
-    printf("%d", value);
-  }
+  
+  x = pos_x[tile->x];
+  y = pos_y[tile->y];
+  value = tile_get_value(tile);
+  s = values[value];
+  cputsxy( x, y, s );
 
   textcolor( COLOR_BLACK );
-  
-  /*
+ 
+  /* 
   gotoxy(20, tile->y * 4 + tile->x);
   printf("x:%d, y:%d, v:%d, d:%d\n", tile->x, tile->y, tile->value, tile_dirty(tile));
   drawn++;
@@ -43,18 +71,58 @@ void draw_cell(tile *tile)
   */
 }
 
+static void draw_grid(void)
+{
+  char i;
+  #define w (4*6)
+  cputcxy( 0, 0, '+' );
+  cputcxy( 0, w, '+' );
+  cputcxy( w, 0, '+' );
+  cputcxy( w, w, '+' );
+  for(i=1;i<w-1;i++) {
+    cputcxy(   i,   0, '-' );   
+    cputcxy( w-i,   0, '-' );   
+    cputcxy(   0,   i, '-' );   
+    cputcxy(   0, w-i, '-' );   
+  }
+}
+
+static void draw_screen(void)
+{
+  char i;
+  char j;
+  char k;
+  char tile;
+
+  k = 0;
+  for(i=0;i<5;i++) {
+    for(j=0;j<8;j++) {
+      tile = map[k];
+      chars_draw_tile( j, i, tile );
+      k++;
+    }
+  }
+}
+
 int main(int argc, char *argv[])
 {
   char input;
   direction direction;
+
+  charset_init();
+  chars_init();
+  draw_screen();
+
+  while(!kbhit()) {};
+
   game_init(draw_cell);
 
   textcolor( COLOR_BLACK );
   clrscr();
+  draw_grid();
 
   while(1) {
 
-    clrscr();
     drawn=0;
     game_draw();   
  

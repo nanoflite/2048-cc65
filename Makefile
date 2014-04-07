@@ -1,5 +1,5 @@
-SOURCES = main.c game.c grid.c tile.c array.c
-ASOURCES =
+SOURCES = main.c game.c grid.c tile.c array.c map.c map_data.c tiles_data.c chars_data.c attribs_data.c 
+ASOURCES = characters.s data.s
 CC65_TARGET = c64
 PROGRAM = 2048.prg
 

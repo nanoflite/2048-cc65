@@ -8,15 +8,15 @@
 typedef struct tile {
   unsigned char x;
   unsigned char y;
-  unsigned int value;
+  unsigned char value;
   unsigned char flags;
 } tile;
 
-void tile_init(tile *tile, unsigned char x, unsigned char y, unsigned int value);
+void tile_init(tile *tile, unsigned char x, unsigned char y, unsigned char value);
 
-unsigned int tile_get_value(tile *tile);
+unsigned char tile_get_value(tile *tile);
 
-void tile_set_value(tile *tile, unsigned int value);
+void tile_set_value(tile *tile, unsigned char value);
 
 void tile_set_moved(tile *tile, bool moved);
 

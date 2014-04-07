@@ -64,7 +64,7 @@ void grid_available_cells(array *cells)
   unsigned char i;
   unsigned char j;
   tile *tile;
-  unsigned int value;
+  unsigned char value;
 
   array_init(cells, width*width);
   for(i=0;i<width;i++) {

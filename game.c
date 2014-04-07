@@ -15,7 +15,7 @@ char vector_x[] = {  0, 1, 0, -1 };
 char vector_y[] = { -1, 0, 1,  0 };
 
 static void insert_start_tiles(void);
-static unsigned int get_random_value(void);
+static unsigned char get_random_value(void);
 static bool moves_available(void);
 static bool matching_tiles_available(void);
 
@@ -37,7 +37,7 @@ void game_init(game_draw_cell_cb draw_cell)
 void game_add_random_tile(void)
 {
   tile *tile;
-  unsigned int value;
+  unsigned char value;
 
   tile = grid_random_available_cell(); 
   if ( NULL == tile ) {
@@ -120,8 +120,8 @@ static void move_right(void)
 
 static bool can_has_add(tile *t, tile *tn)
 {
-  unsigned int value;
-  unsigned int next_value;
+  unsigned char value;
+  unsigned char next_value;
 
   if (tile_dirty(t)) {
     return false;
@@ -149,9 +149,8 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
   signed char column;
   signed char row;
   signed char next_row;
-  unsigned int value;
-  unsigned int next_value;
-  unsigned int sum;
+  unsigned char value;
+  unsigned char next_value;
   tile *next_tile;
   tile *tile;
   signed char i;
@@ -172,11 +171,11 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
       next_value = tile_get_value(next_tile);
 
       if (can_has_add(tile, next_tile)) {
-        sum = value + next_value;
-        if ( GOAL == sum ) {
+        value++;
+        if ( GOAL == value ) {
           won = true;
         }
-        tile_set_value( tile, sum );
+        tile_set_value( tile, value );
         tile_set_added( tile, true );
         tile_set_dirty( tile, true );
         tile_set_value( next_tile, 0 );
@@ -238,39 +237,21 @@ void game_draw(void)
 
 static void insert_start_tiles(void)
 {
-  tile *tile;
-
-  tile = grid_get(0, 1);
-  tile_set_value(tile, 2); 
-
-
-  tile = grid_get(1, 1);
-  tile_set_value(tile, 2); 
-
-  tile = grid_get(2, 1);
-  tile_set_value(tile, 2); 
-
-
-  tile = grid_get(3, 1);
-  tile_set_value(tile, 2); 
-
-  /*
   unsigned char i;
   tile *tile;
 
   for(i=0;i<nr_start_tiles;i++) {
     tile = grid_random_available_cell();
-    tile_set_value(tile, 2); 
+    tile_set_value(tile, 1); 
   }
-  */
 }
 
-static unsigned int get_random_value(void)
+static unsigned char get_random_value(void)
 {
   if (rand() < PERCENT_CHANCE_FOR_A_4) {
-    return 4;
+    return 2;
   }
-  return 2;
+  return 1;
 }
 
 static bool moves_available(void)
@@ -287,7 +268,7 @@ static bool matching_tiles_available(void)
   direction direction;
   tile *next_tile;
   tile *tile;
-  unsigned int value;
+  unsigned char value;
 
   for(y=0;y<width;y++) {
     for(x=0;x<width;x++) {
