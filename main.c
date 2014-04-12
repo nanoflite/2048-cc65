@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <conio.h>
 
@@ -37,63 +39,145 @@ static void draw_screen(void)
   }
 }
 
+static char wait_kbhit(void)
+{
+  while(!kbhit()) {};
+  return cgetc();
+}
+
+static void draw_you_won(void)
+{
+  chars_draw_tile( 3, 2, 18 );
+  chars_draw_tile( 4, 2, 19 );
+}
+
+static void draw_game_over(void)
+{
+  chars_draw_tile( 3, 2, 20 );
+  chars_draw_tile( 4, 2, 21 );
+}
+
+static bool draw_and_ask_restart(void)
+{
+  char input;
+  chars_draw_tile( 3, 2, 22 );
+  chars_draw_tile( 4, 2, 23 );
+  
+  input = wait_kbhit();
+  if ( 'y' == input || 'Y' == input ) {
+    return true;
+  }
+  
+  return false;
+}
+
+static void _draw_score(unsigned int score, char *screen)
+{
+  #define SCREEN 0x8000
+
+  int i;
+  char string[8];
+  char n;
+ 
+  itoa(score, string, 10);
+  for(i=strlen(string)-1;i>=0;i--) {
+    *screen = 219 - '0' + string[i];
+    screen--;
+  }
+}
+
+static void draw_score(void)
+{
+  _draw_score( game_score(), (char*) SCREEN + 40 * 1 + ( 3 * 5 ) - 1 );
+  _draw_score( game_best_score(), (char*) SCREEN + 40 * 1 + ( 6 * 5 ) - 1 );
+}
+
+direction get_direction(char input)
+{
+  direction direction;
+
+  switch (input) {
+    case 'w':
+    case 'W':
+      direction = DIR_UP;
+      break;
+    case 'd':
+    case 'D':
+      direction = DIR_RIGHT;
+      break;
+    case 's':
+    case 'S':
+      direction = DIR_DOWN;
+      break;
+    case 'a':
+    case 'A':
+      direction = DIR_LEFT;
+      break;
+    default:
+      direction = DIR_UNKNOWN;
+  }
+
+  return direction;
+}
+
+void show_title(void)
+{
+  clrscr();
+  puts("Welcome to 2048 for the C64!!!");
+  puts("Use WASD to move the tiles.");
+  puts("Use 'q' to quit current game.");
+  puts("");
+  puts("Enjoy!");
+  puts("(c) 2014 Johan Van den Brande (ACT^OTL)");
+  puts("");
+  puts("Press the any key to proceed...");
+  wait_kbhit();
+  clrscr();
+}
+
 int main(int argc, char *argv[])
 {
   char input;
   direction direction;
 
-  game_init(draw_cell);
-  
+  show_title();
+
   charset_init();
   chars_init();
-  draw_screen();
 
-  while(1) {
+  while (1) {
+    game_init(draw_cell);
+    draw_screen();
+    draw_score();
+    while(1) {
+      game_draw();   
+      input = wait_kbhit();
 
-    game_draw();   
- 
-    while(!kbhit()) {};
+      if ( 'q' == input || 'Q' == input ) {
+        if (draw_and_ask_restart()) {
+          break;
+        }
+      }
 
-    input = cgetc();
-    switch (input) {
-      case 'w':
-      case 'W':
-        direction = DIR_UP;
-        break;
-      case 'd':
-      case 'D':
-        direction = DIR_RIGHT;
-        break;
-      case 's':
-      case 'S':
-        direction = DIR_DOWN;
-        break;
-      case 'a':
-      case 'A':
-        direction = DIR_LEFT;
-        break;
-      case '?':
-        game_dump();
-        break;
-      default:
-        direction = DIR_UNKNOWN;
-    }
-    game_move(direction);
+      direction = get_direction(input);
+      game_move(direction);
+      draw_score();
    
-    if (game_moved()) {
-      game_add_random_tile();
+      if (game_moved()) {
+        game_add_random_tile();
+      }
+
+      if (game_is_finsihed()) {
+        if ( game_won() ) {
+          draw_you_won();
+        } else {
+          draw_game_over();
+        }
+        wait_kbhit();
+        break;
+      }
     }
 
-    if (game_is_finsihed()) {
-      break;
-    }
- 
-  }
-  
-  if ( game_won() ) {
-    printf("\nYOU WIN!");
-  } else {
-    printf("\nGAME OVER");
   }
 
   return 0;

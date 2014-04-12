@@ -3,7 +3,7 @@
 #include "tile.h"
 
 #define nr_start_tiles 2
-#define GOAL 11
+#define GOAL 11 
 
 #define PERCENT_CHANCE_FOR_A_4 ( RAND_MAX / 50 )
 
@@ -30,5 +30,9 @@ bool game_won(void);
 bool game_moved(void);
 
 void game_draw(void);
+
+unsigned int game_score(void);
+
+unsigned int game_best_score(void);
 
 void game_dump(void);

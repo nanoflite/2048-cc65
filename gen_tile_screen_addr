@@ -1,7 +1,40 @@
 #!/bin/bash
 
+cat <<EOT
+
+.export _tile_ptr
+.export _screen_ptr
+.export _color_ptr
+
+.import _tiles
+
+SCREEN = \$8000
+COLOR = \$D800
+
+EOT
+
+# Generate tile pointers
+nr_tiles=25
+echo "_tile_ptr:"
+for tile in $(jot - 0 25); do
+  echo "  .addr _tiles + 25 * $tile"
+done
+echo ""
+
+# Generate SCREEN adresses for the tiles
+echo "_screen_ptr:"
 for y in $(jot - 0 20 5); do
   for x in $(jot - 0 35 5); do
     echo ".addr SCREEN + $y * 40 + $x"
   done
 done
+echo ""
+
+# Generate COLOR adresses for the tiles
+echo "_color_ptr:"
+for y in $(jot - 0 20 5); do
+  for x in $(jot - 0 35 5); do
+    echo ".addr COLOR + $y * 40 + $x"
+  done
+done
+echo ""

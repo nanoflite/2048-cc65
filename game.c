@@ -19,9 +19,12 @@ static unsigned char get_random_value(void);
 static bool moves_available(void);
 static bool matching_tiles_available(void);
 
+static unsigned int best_score = 0;
+
 bool won;
 bool moved;
 game_draw_cell_cb draw_cell_cb;
+unsigned int score;
 
 void game_init(game_draw_cell_cb draw_cell)
 {
@@ -32,6 +35,7 @@ void game_init(game_draw_cell_cb draw_cell)
   insert_start_tiles();
   won = false;
   moved = true;
+  score = 0;
 }
 
 void game_add_random_tile(void)
@@ -172,6 +176,10 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
 
       if (can_has_add(tile, next_tile)) {
         value++;
+        score += value;
+        if (score > best_score) {
+          best_score = score;
+        }
         if ( GOAL == value ) {
           won = true;
         }
@@ -306,4 +314,14 @@ void game_dump(void)
 
   while(!kbhit()) {}; cgetc();
   
+}
+
+unsigned int game_score(void)
+{
+  return score;
+}
+
+unsigned int game_best_score(void)
+{
+  return best_score;
 }
