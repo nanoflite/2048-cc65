@@ -1,6 +1,8 @@
 #ifndef __TILE_H__
 #define __TILE_H__
 
+#include <stdbool.h>
+
 #define FLAG_MOVED 1
 #define FLAG_ADDED 2
 #define FLAG_DIRTY 4
