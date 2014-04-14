@@ -8,6 +8,7 @@
 #include "game.h"
 #include "characters.h"
 #include "map_data.h"
+#include "introscreen_data.h"
 
 static void draw_cell(tile *tile)
 {
@@ -77,7 +78,6 @@ static void _draw_score(unsigned int score, char *screen)
 
   int i;
   char string[8];
-  char n;
  
   itoa(score, string, 10);
   for(i=strlen(string)-1;i>=0;i--) {
@@ -122,16 +122,22 @@ direction get_direction(char input)
 
 void show_title(void)
 {
-  clrscr();
-  puts("Welcome to 2048 for the C64!!!");
-  puts("Use WASD to move the tiles.");
-  puts("Use 'q' to quit current game.");
-  puts("");
-  puts("Enjoy!");
-  puts("(c) 2014 Johan Van den Brande (ACT^OTL)");
-  puts("");
-  puts("Press the any key to proceed...");
+  char *data;
+  unsigned int i;
+  char *screen;
+  
+  screen  = (unsigned char*) 0x0400; // Still standard screen address here;
+  *(unsigned char *)0xd018 = 0x15; // Switch to uppercase charset
+  data = introscreen;
+  for(i=0; i<introscreen_len; i++) {
+    *screen = *data;
+    screen++;
+    data++;
+  }
   wait_kbhit();
+  textcolor(COLOR_WHITE);
+  bordercolor(COLOR_WHITE);
+  bgcolor(COLOR_WHITE);
   clrscr();
 }
 
@@ -151,8 +157,18 @@ int main(int argc, char *argv[])
     draw_score();
     while(1) {
       game_draw();   
-      input = wait_kbhit();
 
+      if (game_is_finsihed()) {
+        if ( game_won() ) {
+          draw_you_won();
+        } else {
+          draw_game_over();
+        }
+        wait_kbhit();
+        break;
+      }
+
+      input = wait_kbhit();
       if ( 'q' == input || 'Q' == input ) {
         if (draw_and_ask_restart()) {
           break;
@@ -167,15 +183,6 @@ int main(int argc, char *argv[])
         game_add_random_tile();
       }
 
-      if (game_is_finsihed()) {
-        if ( game_won() ) {
-          draw_you_won();
-        } else {
-          draw_game_over();
-        }
-        wait_kbhit();
-        break;
-      }
     }
 
   }

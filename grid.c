@@ -85,6 +85,7 @@ bool grid_cells_are_available(void)
   grid_available_cells(&cells);
   available = cells.length > 0;
   array_destroy(&cells);
+
   return available; 
 }
 

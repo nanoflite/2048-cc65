@@ -246,11 +246,9 @@ void game_draw(void)
 static void insert_start_tiles(void)
 {
   unsigned char i;
-  tile *tile;
 
   for(i=0;i<nr_start_tiles;i++) {
-    tile = grid_random_available_cell();
-    tile_set_value(tile, 1); 
+    game_add_random_tile();
   }
 }
 
