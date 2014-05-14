@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
   screen_init();
 
   while (1) {
+    screen_reinit();
     game_init(screen_draw_cell);
     screen_draw();
     screen_draw_score();

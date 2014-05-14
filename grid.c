@@ -33,7 +33,10 @@ void grid_draw(grid_draw_cell_cb draw_cell)
   for(i=0; i<width; i++) {
     for(j=0; j<width; j++) {
       tile = &grid[i][j];
-      draw_cell( tile );
+      if (tile_needs_drawing(tile)) {
+        draw_cell( tile );
+        tile_set_needs_drawing(tile, false);
+      }
     }
   }
  

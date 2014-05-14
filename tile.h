@@ -6,6 +6,7 @@
 #define FLAG_MOVED 1
 #define FLAG_ADDED 2
 #define FLAG_DIRTY 4
+#define FLAG_NEEDS_DRAWING 8
 
 typedef struct tile {
   unsigned char x;
@@ -31,5 +32,9 @@ bool tile_added(tile *tile);
 void tile_set_dirty(tile *tile, bool dirty);
 
 bool tile_dirty(tile *tile);
+
+void tile_set_needs_drawing(tile *tile, bool needs_drawing);
+
+bool tile_needs_drawing(tile *tile);
 
 #endif

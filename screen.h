@@ -9,6 +9,7 @@ void screen_draw_game_over(void);
 bool screen_draw_and_ask_restart(void);
 void screen_title(void);
 void screen_init(void);
+void screen_reinit(void);
 void screen_draw(void);
 void screen_draw_score(void);
 

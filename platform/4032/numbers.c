@@ -1,0 +1,204 @@
+static char* screen = (char *) 0x8000;
+
+static char map[] = {
+            // TBLR (top, bottom, left, right)
+  0x20,     // (0x00) 0000 space 
+  0x20,     // (0x01) 0001 N/A
+  0x20,     // (0x02) 0010 N/A
+  0x40,     // (0x03) 0011 horizontal line
+  0x20,     // (0x04) 0100 N/A 
+  0x70,     // (0x05) 0101 corner top left
+  0x6E,     // (0x06) 0110 corner top right
+  0x72,     // (0x07) 0111 T
+  0x20,     // (0x08) 1000
+  0x6D,     // (0x09) 1001 corner bottom left
+  0x7D,     // (0x0A) 1010 corner bottom right
+  0x71,     // (0x0B) 1011 T upside down
+  0x5D,     // (0x0C) 1100 vertical line
+  0x6B,     // (0x0D) 1101 T right
+  0x73,     // (0x0E) 1110 T left
+  0x5B,     // (0x0F) 1111 +
+};
+
+unsigned char numbers_data[] = {
+0x70,0x40,0x6E,0x20,0x20,0x70,0x6E,0x20,0x70,0x40,0x6E,0x20,0x70,0x40,0x6E,0x20,0x70,0x6E,0x20,0x20,0x70,0x40,0x6E,0x20,0x70,0x40,0x6E,0x20,0x70,0x40,0x6E,0x20,0x70,0x40,0x6E,0x20,0x70,0x40,0x6E,0x20,
+0x5D,0x64,0x5D,0x20,0x20,0x5D,0x5D,0x20,0x6B,0x40,0x5D,0x20,0x6B,0x40,0x5D,0x20,0x5D,0x6D,0x6E,0x20,0x5D,0x40,0x73,0x20,0x5D,0x40,0x73,0x20,0x6D,0x6E,0x5D,0x20,0x5D,0x40,0x5D,0x20,0x5D,0x40,0x5D,0x20,
+0x5D,0x20,0x5D,0x20,0x20,0x5D,0x5D,0x20,0x5D,0x40,0x73,0x20,0x6B,0x40,0x5D,0x20,0x6D,0x6E,0x5D,0x20,0x6B,0x40,0x5D,0x20,0x5D,0x40,0x5D,0x20,0x20,0x5D,0x5D,0x20,0x5D,0x40,0x5D,0x20,0x6B,0x40,0x5D,0x20,
+0x6D,0x40,0x7D,0x7E,0x20,0x6D,0x7D,0x7E,0x6D,0x40,0x7D,0x7E,0x6D,0x40,0x7D,0x7E,0x20,0x6D,0x7D,0x7E,0x6D,0x40,0x7D,0x7E,0x6D,0x40,0x7D,0x7E,0x20,0x6D,0x7D,0x7E,0x6D,0x40,0x7D,0x7E,0x6D,0x40,0x7D,0x7E
+};
+
+static char char_to_code(char c)
+{
+  switch (c) {
+    case 0x020:
+      return 0x00;
+      break;
+    case 0x40:     // (0x03) 0011 horizontal line
+      return 0x03;
+      break;
+    case 0x70:     // (0x05) 0101 corner top left
+      return 0x05;
+      break;
+    case 0x6E:     // (0x06) 0110 corner top right
+      return 0x06;
+      break;
+    case 0x72:     // (0x07) 0111 T
+      return 0x07;
+      break;
+    case 0x6D:     // (0x09) 1001 corner bottom left
+      return 0x09;
+      break;
+    case 0x7D:     // (0x0A) 1010 corner bottom right
+      return 0x0A;
+      break;
+    case 0x71:     // (0x0B) 1011 T upside down
+      return 0x0B;
+      break;
+    case 0x5D:     // (0x0C) 1100 vertical line
+      return 0x0C;
+      break;
+    case 0x6B:     // (0x0D) 1101 T right
+      return 0x0D;
+      break;
+    case 0x73:     // (0x0E) 1110 T left
+      return 0x0E;
+      break;
+    case 0x5B:     // (0x0F) 1111 +
+      return 0x0F;
+      break;
+  }
+  return 0x80;
+}
+
+static char code_to_char(char code)
+{
+  return map[code];
+}
+
+static char merge(char *s, char data)
+{
+  char new;
+
+  new = char_to_code(*s) | char_to_code(data);
+
+  if (new & 0x80) {
+    return data;
+  }
+  return code_to_char(new);
+}
+
+void numbers_set_screen(char *new_screen)
+{
+  screen = new_screen;
+}
+
+void numbers_digit_xy_condensed(char digit, char x, char y)
+{
+  char *data;
+  char *s;
+  char i,j;
+
+  data = numbers_data + 4 * digit;
+  s = screen + 40 * y + x - 2;
+  
+  for(i=0;i<4;i++) {
+    for(j=0;j<3;j++) {
+      *s = merge(s, *data);
+      s++;
+      data++;
+    }
+    s += 40 - 3;
+    data += 40 - 3;
+  } 
+}
+
+void numbers_digit_xy(char digit, char x, char y)
+{
+  unsigned char *data;
+  char *s;
+  char i,j;
+
+  data = numbers_data + 4 * digit;
+  s = screen + 40 * y + x;
+  
+  for(i=0;i<4;i++) {
+    for(j=0;j<3;j++) {
+      *s = *data;
+      s++;
+      data++;
+    }
+    s += 40 - 3;
+    data += 40 - 3;
+  } 
+}
+
+void numbers_number_xy(unsigned int value, char x, char y)
+{
+  char digit;
+
+  while ( value > 0 ) {
+    digit = value % 10;
+    value /= 10;
+    numbers_digit_xy( digit, x, y );
+    x -= 3;
+  }
+}
+
+void numbers_number_xy_condensed(unsigned int value, char x, char y)
+{
+  char digit;
+
+  while ( value > 0 ) {
+    digit = value % 10;
+    value /= 10;
+    numbers_digit_xy_condensed( digit, x, y );
+    x -= 2;
+  }
+}
+
+void numbers_hline(unsigned char x, unsigned char y, unsigned length)
+{
+  char *s;
+  unsigned char i;
+
+  s = screen + 40 * y + x;
+
+  for(i=0;i<length;i++){
+    *s = merge(s, 0x40);
+    s++;
+  } 
+  
+}
+
+void numbers_vline(unsigned char x, unsigned char y, unsigned length)
+{
+  char *s;
+  unsigned char i;
+
+  s = screen + 40 * y + x;
+
+  for(i=0;i<length;i++){
+    *s = merge(s, 0x5D);
+    s+=40;
+  } 
+ 
+}
+
+void numbers_clear_rect(unsigned char x, unsigned char y, unsigned char number_of_digits)
+{
+  char *s;
+  unsigned char i, j, n;
+
+  n = 3 + ( number_of_digits - 1 ) * 2;
+  s = screen + 40 * y + x;
+
+  for(i=0;i<4;i++) {
+    for(j=0;j<n;j++){
+      *s = 0x20;
+      s--;
+    }
+    s += 40 + n;
+  } 
+
+}
+

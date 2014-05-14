@@ -11,6 +11,7 @@
 #include "introscreen_data.h"
 #include "game.h"
 #include "utils.h"
+#include "grid.h"
 
 void screen_draw_cell(tile *tile)
 {
@@ -57,6 +58,8 @@ void screen_draw_game_over(void)
 bool screen_draw_and_ask_restart(void)
 {
   char input;
+  tile *tile;
+
   chars_draw_tile( 3, 2, 22 );
   chars_draw_tile( 4, 2, 23 );
   
@@ -64,6 +67,14 @@ bool screen_draw_and_ask_restart(void)
   if ( 'y' == input || 'Y' == input ) {
     return true;
   }
+
+  chars_draw_tile( 3, 2, 0 );
+  chars_draw_tile( 4, 2, 0 );
+
+  tile = grid_get(1, 1);
+  tile_set_needs_drawing(tile, true);
+  tile = grid_get(1, 2);
+  tile_set_needs_drawing(tile, true);
   
   return false;
 }
@@ -115,3 +126,5 @@ void screen_init(void)
   chars_init();
 }
 
+void screen_reinit(void)
+{}

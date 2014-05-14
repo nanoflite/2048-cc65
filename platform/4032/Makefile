@@ -1,4 +1,4 @@
-SOURCES = ../../main.c ../../utils.c ../../game.c ../../grid.c ../../tile.c ../../array.c screen.c
+SOURCES = ../../main.c ../../utils.c ../../game.c ../../grid.c ../../tile.c ../../array.c screen.c numbers.c header_data.c
 ASOURCES =
 CC65_TARGET = pet
 PROGRAM = 2048.prg
@@ -7,7 +7,7 @@ CC      = $(CC65_HOME)/bin/cl65
 CFLAGS  = -t $(CC65_TARGET) -g -I../..
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map -Ln $(PROGRAM).lbl -I../..
 
-.PHONY: all clean
+.PHONY: all clean assets
 all: $(PROGRAM)
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -27,4 +27,7 @@ clean:
 	$(RM) $(ASOURCES:.s=.o) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map $(PROGRAM).lbl
 
 run: $(PROGRAM)
-	xpet -default $(PROGRAM)
+	xpet -model 4032 $(PROGRAM)
+
+assets:
+	python ../../json_to_c.py ./assets/header.json > header_data.c

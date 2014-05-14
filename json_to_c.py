@@ -1,9 +1,10 @@
+import sys
 import json
 
 def chunker(seq, size):
   return (seq[pos:pos + size] for pos in xrange(0, len(seq), size))
 
-fp = open('introscreen.json', 'r')
+fp = open(sys.argv[1], 'r')
 js = json.load(fp)
 
 print "unsigned char introscreen[] = {"

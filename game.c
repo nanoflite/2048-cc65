@@ -50,6 +50,7 @@ void game_add_random_tile(void)
 
   value = get_random_value();
   tile_set_value(tile, value);
+  tile_set_needs_drawing(tile, true);
 }
 
 bool game_moved(void)
@@ -188,6 +189,8 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
         tile_set_dirty( tile, true );
         tile_set_value( next_tile, 0 );
         tile_set_dirty( next_tile, false );
+        tile_set_needs_drawing( tile, true );
+        tile_set_needs_drawing( next_tile, true );
         moved = true;
       }
 
@@ -197,6 +200,8 @@ static void _pull_up(grid_get_f get_tile, signed char row_start, signed char row
         tile_set_value(next_tile, 0);
         tile_set_dirty(tile, tile_dirty(next_tile));
         tile_set_dirty(next_tile, false);
+        tile_set_needs_drawing( tile, true );
+        tile_set_needs_drawing( next_tile, true );
         moved = true;
       }
 
