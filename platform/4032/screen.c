@@ -140,3 +140,6 @@ void screen_draw_score(void)
 
 void screen_title(void)
 {}
+
+void screen_reinit(void)
+{}
