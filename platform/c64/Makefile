@@ -1,4 +1,4 @@
-SOURCES = ../../main.c ../../utils.c ../../game.c ../../grid.c ../../tile.c ../../array.c screen.c map.c map_data.c tiles_data.c chars_data.c attribs_data.c introscreen_data.c
+SOURCES = ../../main.c ../../utils.c ../../game.c ../../grid.c ../../tile.c ../../array.c ../../introscreen_data.c screen.c map.c map_data.c tiles_data.c chars_data.c attribs_data.c
 ASOURCES = characters.s data.s
 CC65_TARGET = c64
 PROGRAM = 2048.prg
@@ -29,11 +29,11 @@ clean:
 run: $(PROGRAM)
 	x64 $(PROGRAM)
 
-assets:
+assets: 
 	xxd -i -c8 assets/attribs.raw >attribs_data.c
 	xxd -i -c8 assets/chars.raw >chars_data.c
 	xxd -i -c8 assets/map.raw >map_data.c
 	xxd -i -c5 assets/tiles.raw >tiles_data.c
 	perl -pi -e 's/_raw//g' *_data.c
 	./gen_tile_screen_addr > data.s
-	python ../../json_to_c.py introscreen.json > introscreen_data.c
+	python ../../json_to_c.py ../../introscreen.json > ../../introscreen_data.c

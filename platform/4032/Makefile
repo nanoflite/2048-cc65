@@ -1,4 +1,4 @@
-SOURCES = ../../main.c ../../utils.c ../../game.c ../../grid.c ../../tile.c ../../array.c screen.c numbers.c header_data.c
+SOURCES = ../../main.c ../../utils.c ../../game.c ../../grid.c ../../tile.c ../../array.c ../../introscreen_data.c screen.c numbers.c header_data.c
 ASOURCES =
 CC65_TARGET = pet
 PROGRAM = 2048.prg
@@ -30,4 +30,5 @@ run: $(PROGRAM)
 	xpet -model 4032 $(PROGRAM)
 
 assets:
-	python ../../json_to_c.py ./assets/header.json > header_data.c
+	python ../../json_to_c.py pet header ./assets/header.json > header_data.c
+	python ../../json_to_c.py pet introscreen ../../assets/introscreen.json > ../../introscreen_data.c

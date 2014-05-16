@@ -45,13 +45,13 @@ static void box(const char *text)
 
 void screen_init(void)
 {
+}
+
+void screen_reinit(void)
+{
   unsigned char i;
   char *s, *d;
 
-  asm("lda #142"); // graphics/uppercase
-  asm("jsr $ffd2");
-  asm("lda #147"); // clr home
-  asm("jsr $ffd2");
   clrscr();
 
   s = (char *)SCREEN;
@@ -66,7 +66,6 @@ void screen_init(void)
     numbers_hline(0, 10 + 5 * i, 40 );
     numbers_vline( 10 + i * 10, 6, 19 );
   }
-
 }
 
 void screen_draw_cell(tile *tile)
@@ -114,10 +113,6 @@ bool screen_draw_and_ask_restart(void)
     return true;
   }
   
-  /*
-  x = 10 * tile->x + 9;
-  y =  5 * tile->y + 6;
-  */
   numbers_vline( 10 + 1 * 10, 6, 19 );
   numbers_clear_rect( 10 * 1 + 9, 5 * 1 + 6, 4);
   numbers_clear_rect( 10 * 2 + 9, 5 * 1 + 6, 4);
@@ -139,7 +134,19 @@ void screen_draw_score(void)
 }
 
 void screen_title(void)
-{}
+{
+  char *screen;
 
-void screen_reinit(void)
-{}
+  asm("lda #142"); // graphics/uppercase
+  asm("jsr $ffd2");
+  asm("lda #147"); // clr home
+  asm("jsr $ffd2");
+
+  screen  = (unsigned char*) 0x8000; // Still standard screen address here;
+  utils_draw_introscreen(screen);
+
+  wait_kbhit();
+  clrscr();
+}
+
+

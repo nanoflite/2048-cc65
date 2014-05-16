@@ -8,7 +8,7 @@
 #include "map.h"
 #include "characters.h"
 #include "map_data.h"
-#include "introscreen_data.h"
+// #include "introscreen_data.h"
 #include "game.h"
 #include "utils.h"
 #include "grid.h"
@@ -101,6 +101,13 @@ void screen_draw_score(void)
 
 void screen_title(void)
 {
+  char *screen;
+  screen  = (unsigned char*) 0x0400; // Still standard screen address here;
+  *(unsigned char *)0xd018 = 0x15; // Switch to uppercase charset
+
+  utils_draw_introscreen(screen);
+
+  /*
   char *data;
   unsigned int i;
   char *screen;
@@ -113,6 +120,8 @@ void screen_title(void)
     screen++;
     data++;
   }
+  */
+
   wait_kbhit();
   textcolor(COLOR_WHITE);
   bordercolor(COLOR_WHITE);
