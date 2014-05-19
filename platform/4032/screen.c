@@ -16,6 +16,30 @@
 
 #define SCREEN 0x8000
 
+char numbers_source[40*25];
+
+char *number_sources[12];
+char *number_destinations[16];
+
+static void block_copy(char from, char to)
+{
+  #define W 9 
+  char x, y;
+  char *s, *d;
+  
+  s = number_sources[from];
+  d = number_destinations[to];
+
+  for(y=0;y<4;y++) {
+    for(x=0;x<W;x++) {
+      *d++ = *s++;
+    }
+    d += 40 - W;
+    s += 40 - W;
+  }
+  #undef W
+}
+
 static void box(const char *text)
 {
   char i, x;
@@ -70,20 +94,7 @@ void screen_reinit(void)
 
 void screen_draw_cell(tile *tile)
 {
-  char x;
-  char y;
-  unsigned char value;
-
-  x = 10 * tile->x + 9;
-  y =  5 * tile->y + 6;
-  value = tile_get_value(tile);
- 
-  numbers_clear_rect(x, y, 4);
-
-  if ( value != 0 ) {
-    numbers_number_xy_condensed( 1 << value, x, y );
-  }
-
+  block_copy( tile_get_value(tile), ( tile->y << 2 ) + tile->x );
 }
 
 void screen_draw(void)
@@ -91,13 +102,11 @@ void screen_draw(void)
 
 void screen_draw_you_won(void)
 {
-  //cputsxy(10, 10, "YOU WON");
   box("you won");
 }
 
 void screen_draw_game_over(void)
 {
-  //cputsxy(10, 10, "GAME OVER");
   box("game over");
 }
 
@@ -105,7 +114,6 @@ bool screen_draw_and_ask_restart(void)
 {
   char input;
 
-  // cputsxy(11, 13, "restart y/n?");
   box("restart y/n?"); 
 
   input = wait_kbhit();
@@ -133,6 +141,50 @@ void screen_draw_score(void)
 
 }
 
+static void prepare(void)
+{
+  char i, x, y;
+  char *s;
+
+  // Generate numbers in shadow space.
+  s = numbers_source;
+  for(y=0;y<25;y++) {
+    for(x=0;x<40;x++) {
+      *s = 0x20;
+      s++;
+    }
+  }
+
+  numbers_set_screen(numbers_source);
+
+  for(i=0;i<12;i++) {
+    x = i & 0x03;
+    y = ( i & ~0x03 ) >> 2;
+
+    number_sources[i] = numbers_source + ( 5 + y  * 5 ) * 40 + 10 * x + 1;
+
+    x = 9 + x * 10;
+    y = 5 + y * 5;
+
+    if ( i > 0 ) {
+      numbers_number_xy_condensed( 1 << i, x, y );
+    }
+
+  }
+
+  i = 0;
+  for(y=0;y<4;y++) {
+    for(x=0;x<4;x++) {
+      number_destinations[i] = (char*) SCREEN + ( 6 + y * 5 ) * 40 + 10 * x + 1;
+      i++;
+    }
+  }
+
+  numbers_set_screen((unsigned char*) SCREEN);
+
+  wait_kbhit();
+}
+
 void screen_title(void)
 {
   char *screen;
@@ -142,11 +194,12 @@ void screen_title(void)
   asm("lda #147"); // clr home
   asm("jsr $ffd2");
 
-  screen  = (unsigned char*) 0x8000; // Still standard screen address here;
+  screen  = (unsigned char*) SCREEN; // Still standard screen address here;
   utils_draw_introscreen(screen);
+  
+  prepare();
 
   wait_kbhit();
-  clrscr();
 }
 
 
