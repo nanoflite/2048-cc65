@@ -8,7 +8,7 @@ CFLAGS  = -t $(CC65_TARGET) -g -I../..
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map -Ln $(PROGRAM).lbl -I../..
 
 .PHONY: all clean assets
-all: $(PROGRAM)
+all: assets $(PROGRAM)
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(SOURCES:.c=.d)
@@ -26,7 +26,7 @@ $(PROGRAM): $(SOURCES:.c=.o) $(ASOURCES:.s=.o)
 clean:
 	$(RM) $(ASOURCES:.s=.o) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map $(PROGRAM).lbl
 
-run: $(PROGRAM)
+run: all
 	xpet -model 4032 $(PROGRAM)
 
 assets:

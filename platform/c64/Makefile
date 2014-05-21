@@ -7,8 +7,8 @@ CC      = $(CC65_HOME)/bin/cl65
 CFLAGS  = -t $(CC65_TARGET) -g -I../..
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map -C c64.cfg -Ln $(PROGRAM).lbl -I../..
 
-.PHONY: all clean
-all: $(PROGRAM)
+.PHONY: all clean assets
+all: assets $(PROGRAM)
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(SOURCES:.c=.d)
@@ -26,7 +26,7 @@ $(PROGRAM): $(SOURCES:.c=.o) $(ASOURCES:.s=.o)
 clean:
 	$(RM) $(ASOURCES:.s=.o) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map $(PROGRAM).lbl
 
-run: $(PROGRAM)
+run: all
 	x64 $(PROGRAM)
 
 assets: 
@@ -35,5 +35,6 @@ assets:
 	xxd -i -c8 assets/map.raw >map_data.c
 	xxd -i -c5 assets/tiles.raw >tiles_data.c
 	perl -pi -e 's/_raw//g' *_data.c
+	perl -pi -e 's/assets_//g' *_data.c
 	./gen_tile_screen_addr > data.s
-	python ../../json_to_c.py ../../introscreen.json > ../../introscreen_data.c
+	python ../../json_to_c.py c64 introscreen ../../assets/introscreen.json > ../../introscreen_data.c
