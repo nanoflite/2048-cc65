@@ -4,7 +4,7 @@ CC65_TARGET = c64
 PROGRAM = 2048.prg
 
 CC      = $(CC65_HOME)/bin/cl65
-CFLAGS  = -t $(CC65_TARGET) -g -I../..
+CFLAGS  = -t $(CC65_TARGET) -O -g -I../..
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map -C c64.cfg -Ln $(PROGRAM).lbl -I../..
 
 .PHONY: all clean assets
